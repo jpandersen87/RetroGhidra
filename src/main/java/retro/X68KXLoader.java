@@ -98,7 +98,7 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
 
         Memory memory = program.getMemory();
         FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
-        X68KAddressSpace addressSpace = new X68KAddressSpace();
+        X68KAddressSpace addressSpace = (X68KAddressSpace) program.getAddressFactory().getDefaultAddressSpace();
         BinaryReader reader = new BinaryReader(provider, false);
 
         try {
