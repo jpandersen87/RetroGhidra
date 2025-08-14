@@ -110,7 +110,7 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
             final long textSize = reader.readUnsignedInt(XX_OFF_TEXT_SIZE);
             final long dataSize = reader.readUnsignedInt(XX_OFF_DATA_SIZE);
             final long reallocSize = reader.readUnsignedInt(XX_OFF_REALLOC_SIZE);
-            final long symbTabSize = reader.readUnsignedInt(XX_OFF_SYMBOL_SIZE);
+            final long symTabSize = reader.readUnsignedInt(XX_OFF_SYMBOL_SIZE);
             
             Address headerAddress = AddressSpace.HEADER_SPACE.getAddress(0x0000);
             Address baseAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_BASE_ADDR));
