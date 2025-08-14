@@ -117,7 +117,7 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
             Address runAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_RUN_ADDR));
             Address dataAddress = baseAddress.add(textSize);
             Address reallocAddress = dataAddress.add(dataSize);
-            Address symbTabAddress = reallocAddress.add(reallocSize)
+            Address symbTabAddress = reallocAddress.add(reallocSize);
 
             memory.createInitializedBlock(
                 "HEADER",
