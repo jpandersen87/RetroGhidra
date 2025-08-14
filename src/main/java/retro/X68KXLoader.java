@@ -30,6 +30,7 @@ import ghidra.app.util.opinion.QueryResult;
 import ghidra.program.database.mem.FileBytes;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.address.AddressSpace;
+import ghidra.program.model.address.GenericAddressSpace;
 import ghidra.program.model.data.ArrayDataType;
 import ghidra.program.model.data.ByteDataType;
 import ghidra.program.model.data.StringDataType;
@@ -103,7 +104,7 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
 
         Memory memory = program.getMemory();
         FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
-        X68KAddressSpace addresssSpace = (X68KAddressSpace) program.getAddressFactory().getDefaultAddressSpace();
+        X68KAddressSpace addressSpace = (X68KAddressSpace) program.getAddressFactory().getDefaultAddressSpace();
         BinaryReader reader = new BinaryReader(provider, false);
 
         try {
@@ -113,8 +114,8 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
             final long symTabSize = reader.readUnsignedInt(XX_OFF_SYMBOL_SIZE);
             
             Address headerAddress = AddressSpace.HEADER_SPACE.getAddress(0x0000);
-            Address baseAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_BASE_ADDR));
-            Address runAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_RUN_ADDR));
+            Address baseAddress = addressSpace.getAddress(reader.readUnsignedInt(XX_OFF_BASE_ADDR));
+            Address runAddress = addressSpace.getAddress(reader.readUnsignedInt(XX_OFF_RUN_ADDR));
             Address dataAddress = baseAddress.add(textSize);
             Address reallocAddress = dataAddress.add(dataSize);
             Address symbTabAddress = reallocAddress.add(reallocSize);
