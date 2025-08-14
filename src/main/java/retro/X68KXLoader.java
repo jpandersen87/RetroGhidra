@@ -44,6 +44,11 @@ import ghidra.program.model.util.CodeUnitInsertionException;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.TaskMonitor;
 
+public class X68KAddressSpace extends AddressSpace {
+	public static final AddressSpace HEADER_SPACE = new GenericAddressSpace(
+		"HEADER", 64, TYPE_OTHER, SpaceNames.OTHER_SPACE_INDEX);
+}
+
 /**
  * A {@link Loader} for loading Sharp X68000 .X files.
  */
@@ -98,11 +103,21 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
 
         Memory memory = program.getMemory();
         FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
-        AddressSpace addresssSpace = program.getAddressFactory().getDefaultAddressSpace();
+        X68KAddressSpace addresssSpace = (X68KAddressSpace) program.getAddressFactory().getDefaultAddressSpace();
         BinaryReader reader = new BinaryReader(provider, false);
 
         try {
-            Address headerAddress = AddressSpace.OTHER_SPACE.getAddress(0x0000);
+            final long textSize = reader.readUnsignedInt(XX_OFF_TEXT_SIZE);
+            final long dataSize = reader.readUnsignedInt(XX_OFF_DATA_SIZE);
+            final long reallocSize = reader.readUnsignedInt(XX_OFF_REALLOC_SIZE);
+            final long symbTabSize = reader.readUnsignedInt(XX_OFF_SYMBOL_SIZE);
+            
+            Address headerAddress = AddressSpace.HEADER_SPACE.getAddress(0x0000);
+            Address baseAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_BASE_ADDR));
+            Address runAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_RUN_ADDR));
+            Address dataAddress = baseAddress.add(textSize);
+            Address reallocAddress = dataAddress.add(dataSize);
+            Address symbTabAddress = reallocAddress.add(reallocSize)
 
             memory.createInitializedBlock(
                 "HEADER",
@@ -111,16 +126,8 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
                 0,
                 XX_HEADER_LEN,
                 false);
-
             commentHeader(program, headerAddress);
-
-            Address baseAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_BASE_ADDR));
-            Address runAddress = addresssSpace.getAddress(reader.readUnsignedInt(XX_OFF_RUN_ADDR));
-            Address dataAddress = baseAddress.add(reader.readUnsignedInt(XX_OFF_TEXT_SIZE));
-
-            final long textSize = reader.readUnsignedInt(XX_OFF_TEXT_SIZE);
-            final long dataSize = reader.readUnsignedInt(XX_OFF_DATA_SIZE);
-
+            
             memory.createInitializedBlock(
                 "TEXT",
                 baseAddress,
@@ -144,17 +151,27 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
             );
 
             memory.createInitializedBlock(
-                "REST",
-                dataAddress.add(dataSize),
+                "REALLOC",
+                reallocAddress,
                 fileBytes,
                 XX_HEADER_LEN + textSize + dataSize,
-                reader.length() - XX_HEADER_LEN - textSize - dataSize,
+                reallocSize,
+                false
+            );
+
+            memory.createInitializedBlock(
+                "SYMTAB",
+                dataAddress.add(dataSize),
+                fileBytes,
+                XX_HEADER_LEN + textSize + dataSize + reallocSize,
+                symTabSize,
                 false
             );
         } catch (Exception e) {
             log.appendException(e);
         }
     }
+    
     void commentHeader(Program program, Address headerAddress) throws CodeUnitInsertionException {
         Listing listing = program.getListing();
         Address ha = headerAddress;
