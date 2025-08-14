@@ -95,13 +95,12 @@ public class X68KXLoader extends AbstractProgramWrapperLoader {
     protected void load(ByteProvider provider, LoadSpec loadSpec, List<Option> options,
             Program program, TaskMonitor monitor, MessageLog log)
             throws CancelledException, IOException {
-
-        Memory memory = program.getMemory();
-        FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
-        X68KAddressSpace addressSpace = (X68KAddressSpace) program.getAddressFactory().getDefaultAddressSpace();
-        BinaryReader reader = new BinaryReader(provider, false);
-
         try {
+            Memory memory = program.getMemory();
+            FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
+            X68KAddressSpace addressSpace = (X68KAddressSpace) program.getAddressFactory().getDefaultAddressSpace();
+            BinaryReader reader = new BinaryReader(provider, false);
+            
             final long textSize = reader.readUnsignedInt(XX_OFF_TEXT_SIZE);
             final long dataSize = reader.readUnsignedInt(XX_OFF_DATA_SIZE);
             final long reallocSize = reader.readUnsignedInt(XX_OFF_REALLOC_SIZE);
