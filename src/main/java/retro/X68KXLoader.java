@@ -30,7 +30,6 @@ import ghidra.app.util.opinion.QueryResult;
 import ghidra.program.database.mem.FileBytes;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.address.AddressSpace;
-import ghidra.program.model.address.GenericAddressSpace;
 import ghidra.program.model.data.ArrayDataType;
 import ghidra.program.model.data.ByteDataType;
 import ghidra.program.model.data.StringDataType;
@@ -44,11 +43,6 @@ import ghidra.program.model.symbol.SymbolTable;
 import ghidra.program.model.util.CodeUnitInsertionException;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.TaskMonitor;
-
-public class X68KAddressSpace extends AddressSpace {
-	public static final AddressSpace HEADER_SPACE = new GenericAddressSpace(
-		"HEADER", 64, TYPE_OTHER, SpaceNames.OTHER_SPACE_INDEX);
-}
 
 /**
  * A {@link Loader} for loading Sharp X68000 .X files.
